@@ -4,8 +4,6 @@
   box-sizing: border-box;
 }
 :root {
-  --clock-size: 800px;
-  --clock-speed: 200ms;
 }
 body {
   margin: 0;
@@ -16,15 +14,21 @@ body {
   background-color: rgb(51, 65, 85);
 }
 .clock {
+  --clock-clr-bg: steelblue;
+  --clock-size: 800px;
+  --clock-speed: 200ms;
+  --clock-f-size: 0.9rem;
+  --clock-f-color: white;
+
   position: relative;
   width: var(--clock-size);
   height: var(--clock-size);
   aspect-ratio: 1;
   place-content: center;
-  background: steelblue;
+  background: var(--clock-clr-bg);
   border-radius: 50%;
 }
-/* clock center*/
+/* clock center */
 .clock::before {
   content: "";
   position: absolute;
@@ -35,7 +39,7 @@ body {
   height: 40px;
   border-radius: 50%;
   z-index: 21;
-  background-color: steelblue;
+  background-color: var(--clock-clr-bg);
   border: 1px solid rgba(255 255 255 / 0.25);
 }
 /* clock mask to cover all dates except the current date and time */
@@ -66,12 +70,12 @@ body {
   height: var(--clock-size);
   aspect-ratio: 1;
   border-radius: 50%;
-  font-size: 0.9rem;
+  font-size: var(--clock-f-size);
+  color: var(--clock-f-color);
   transition: var(--clock-speed, 100ms) linear;
 }
 [data-clock="years"] {
   --clock-size: 780px;
-  border-color: transparent;
 }
 [data-clock="seconds"] {
   --clock-size: 675px;
@@ -87,19 +91,15 @@ body {
 }
 [data-clock="months"] {
   --clock-size: 340px;
-  font-size: 0.8rem;
+  --clock-f-size: 0.8rem;
 }
 [data-clock="day-names"] {
   --clock-size: 180px;
-  font-size: 0.8rem;
+  --clock-f-size: 0.8rem;
 }
 .clock > div > span {
   position: absolute;
-  transform-origin: center;
   white-space: nowrap;
-  color: white;
-
-  /*opacity: .25;*/
 }
 .clock > div > span.active {
   /*opacity: 1;*/
