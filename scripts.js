@@ -1,85 +1,97 @@
+const MAX_SECONDS = 60;
+const MAX_MINUTES = 60;
+const MAX_HOURS = 24;
+const DEGREES_IN_CIRCLE = 360;
+
+const lastAngles = {}; // Define lastAngles in global scope
+
 drawClockFaces();
+
+function padWithZero(value) {
+  return value < 10 ? `0${value}` : value; // Pad with '0' if value < 10
+}
 
 function drawClockFaces() {
   const clockFaces = document.querySelectorAll(".clock-face");
-
-  // Get the current date details
   const currentDate = new Date();
-  const currentDay = currentDate.getDate(); // Day of the month (1 to 31)
-  const currentMonth = currentDate.getMonth(); // Month (0 to 11)
-  const currentYear = currentDate.getFullYear(); // Current year
-  const currentWeekday = currentDate.getDay(); // Weekday (0-6, Sunday = 0)
-  const currentHours = currentDate.getHours();
-  const currentMinutes = currentDate.getMinutes();
-  const currentSeconds = currentDate.getSeconds();
-  const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Days in current month (1-31)
 
-  // Get localized weekday and month names
-  const locale = navigator.language || "en-US"; // Default to 'en-US'
-  //const locale = 'ro-RO';
-  const weekdayNames = Array.from(
-    { length: 7 },
-    (_, i) =>
-      new Intl.DateTimeFormat(locale, { weekday: "long" }).format(
-        new Date(2021, 0, i + 3)
-      ) // Jan 3rd is Sunday in 2021
+  // Get current date details
+  const currentDateDetails = {
+    day: currentDate.getDate(),
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
+    weekday: currentDate.getDay(),
+    hours: currentDate.getHours(),
+    minutes: currentDate.getMinutes(),
+    seconds: currentDate.getSeconds(),
+    totalDaysInMonth: new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    ).getDate(),
+  };
+
+  const locale = navigator.language || "en-US";
+  //const locale = "es-ES";
+  const weekdayNames = Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(locale, { weekday: "long" }).format(
+      new Date(2021, 0, i + 3)
+    )
   );
   const monthNames = Array.from({ length: 12 }, (_, i) =>
     new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date(2021, i))
   );
 
+  const createValueSet = (length, pad = false) =>
+    Array.from({ length }, (_, i) =>
+      pad ? String(i).padStart(2, "0") : i + 1
+    );
+
   clockFaces.forEach((clockFace) => {
     const clockType = clockFace.getAttribute("data-clock");
     const numbers = parseInt(clockFace.getAttribute("data-numbers"), 10);
-    const radius = clockFace.offsetWidth / 2 - 20; // Adjusted for padding
-    const center = clockFace.offsetWidth / 2; // Center of the circle
+    const radius = clockFace.offsetWidth / 2 - 20;
+    const center = clockFace.offsetWidth / 2;
 
-    let valueSet;
-    let currentValue; // This will store the current value (e.g., current day, month, year)
+    let valueSet = []; // Initialize valueSet to an empty array
+    let currentValue;
 
-    // Define the value set and current value for each clock type
     switch (clockType) {
       case "seconds":
-        valueSet = Array.from({ length: 60 }, (_, i) =>
-          String(i).padStart(2, "0")
-        ); // 00 to 59
-        currentValue = String(currentSeconds).padStart(2, "0"); // Pad current seconds
+        valueSet = createValueSet(MAX_SECONDS, true); // Create with padding
+        currentValue = padWithZero(currentDateDetails.seconds); // Use padding function
         break;
       case "minutes":
-        valueSet = Array.from({ length: 60 }, (_, i) =>
-          String(i).padStart(2, "0")
-        ); // 00 to 59
-        currentValue = String(currentMinutes).padStart(2, "0"); // Pad current minutes
+        valueSet = createValueSet(MAX_MINUTES, true); // Create with padding
+        currentValue = padWithZero(currentDateDetails.minutes); // Use padding function
         break;
       case "hours":
-        valueSet = Array.from({ length: 24 }, (_, i) =>
-          String(i).padStart(2, "0")
-        ); // 00 to 23
-        currentValue = String(currentHours).padStart(2, "0"); // Pad current hours
+        valueSet = createValueSet(MAX_HOURS, true); // Create with padding
+        currentValue = padWithZero(currentDateDetails.hours); // Use padding function
         break;
       case "days":
-        valueSet = Array.from({ length: totalDaysInMonth }, (_, i) => i + 1); // 1 to 31
-        currentValue = currentDay; // Current day of the month
+        valueSet = createValueSet(currentDateDetails.totalDaysInMonth); // Dynamic for number of days
+        currentValue = currentDateDetails.day; // Day not padded
         break;
       case "months":
-        valueSet = monthNames; // Use localized month names
-        currentValue = currentMonth; // Current month (0-indexed)
+        valueSet = monthNames; // Set this directly to month names
+        currentValue = currentDateDetails.month; // Month not padded
         break;
       case "years":
-        valueSet = Array.from({ length: 101 }, (_, i) => 2000 + i); // Years from 2000 to 2100
-        currentValue = currentYear; // Current year
+        valueSet = createValueSet(101, false).map((year) => 2000 + year - 1);
+        currentValue = currentDateDetails.year - 2000; // Adjust for year indexing
         break;
       case "day-names":
-        valueSet = weekdayNames; // Use localized weekday names
-        currentValue = currentWeekday; // Current weekday (0-6, Sunday = 0)
+        valueSet = weekdayNames; // Dynamic for weekday names
+        currentValue = currentDateDetails.weekday; // Weekday not padded
         break;
       default:
+        console.error(`Unknown clock type: ${clockType}`);
         return;
     }
 
-    // Create and position elements on the clock face
     valueSet.forEach((value, i) => {
-      const angle = i * (360 / numbers); // Determine angle for this number
+      const angle = i * (DEGREES_IN_CIRCLE / numbers);
       const x = center + radius * Math.cos((angle * Math.PI) / 180);
       const y = center + radius * Math.sin((angle * Math.PI) / 180);
 
@@ -88,105 +100,92 @@ function drawClockFaces() {
       element.textContent = value;
       element.style.left = `${x}px`;
       element.style.top = `${y}px`;
-      element.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`; // Rotate the number to be upright at 3 o'clock
-
+      element.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
       clockFace.appendChild(element);
     });
 
-    // Calculate the rotation to align the current value to the 3 o'clock position
-    const currentIndex = valueSet.indexOf(
-      typeof valueSet[0] === "string" ? String(currentValue) : currentValue
-    );
-    const rotationAngle = -((currentIndex / numbers) * 360); // Negative to rotate counterclockwise
+    // Calculate the target angle based on the current value
+    const targetAngle = (DEGREES_IN_CIRCLE / numbers) * currentValue;
+    const clockId = clockFace.id || clockType;
+    const lastAngle = lastAngles[clockId] || 0;
+    const delta = targetAngle - lastAngle;
+    const shortestDelta = ((delta + 540) % DEGREES_IN_CIRCLE) - 180;
 
-    // Apply the rotation to the clock face
-    clockFace.style.transform = `rotate(${rotationAngle}deg)`;
+    const newAngle = lastAngle + shortestDelta;
+    clockFace.style.transform = `rotate(${newAngle * -1}deg)`;
+    lastAngles[clockId] = newAngle;
   });
 }
 
 function rotateClockFaces() {
   const clockFaces = document.querySelectorAll(".clock-face");
 
-  // Store the last known angles for smooth transitions
-  const lastAngles = {};
-
   function updateRotations() {
     const now = new Date();
-    const currentSecond = now.getSeconds();
-    const currentMinute = now.getMinutes();
-    const currentHour = now.getHours();
-    const currentDay = now.getDate();
-    const currentMonth = now.getMonth(); // 0-indexed
-    const currentYear = now.getFullYear();
-    const currentWeekday = now.getDay(); // 0 = Sunday, 6 = Saturday
+    const currentDateDetails = {
+      seconds: now.getSeconds(),
+      minutes: now.getMinutes(),
+      hours: now.getHours(),
+      day: now.getDate() - 1, // Indexed from 0 for days
+      month: now.getMonth(), // 0-indexed
+      year: now.getFullYear(), // Don't subtract 2000 here
+      weekday: now.getDay(),
+    };
 
     clockFaces.forEach((clockFace) => {
       const clockType = clockFace.getAttribute("data-clock");
       const totalNumbers = parseInt(clockFace.getAttribute("data-numbers"), 10);
-
       let currentValue;
+
       switch (clockType) {
         case "seconds":
-          currentValue = currentSecond;
+          currentValue = padWithZero(now.getSeconds()); // Use padding function
           break;
         case "minutes":
-          currentValue = currentMinute;
+          currentValue = padWithZero(now.getMinutes()); // Use padding function
           break;
         case "hours":
-          currentValue = currentHour;
+          currentValue = padWithZero(now.getHours()); // Use padding function
           break;
         case "days":
-          currentValue = currentDay - 1; // Days are 1-indexed
+          currentValue = now.getDate() - 1; // Ensure it is 0-indexed
           break;
         case "months":
-          currentValue = currentMonth;
+          currentValue = now.getMonth(); // 0-indexed
           break;
         case "years":
-          currentValue = currentYear - 2000; // Align with year range (2000-2100)
+          currentValue = now.getFullYear() - 2000; // Year indexing
           break;
+
         case "day-names":
-          currentValue = currentWeekday; // 0 = Sunday
+          currentValue = now.getDay();
           break;
         default:
+          console.error(`Unknown clock type: ${clockType}`);
           return;
       }
 
-      // Calculate target angle
-      const targetAngle = (360 / totalNumbers) * currentValue;
-
-      // Retrieve the last angle for this clock face
+      // Calculate target angle to allow continuous rotation
+      const targetAngle = (DEGREES_IN_CIRCLE / totalNumbers) * currentValue;
       const clockId = clockFace.id || clockType;
       const lastAngle = lastAngles[clockId] || 0;
-
-      // Adjust for shortest rotation direction
       const delta = targetAngle - lastAngle;
-      const shortestDelta = ((delta + 540) % 360) - 180; // Normalize between -180 and 180
+      const shortestDelta = ((delta + 540) % DEGREES_IN_CIRCLE) - 180;
 
-      // Update the clock face rotation
       const newAngle = lastAngle + shortestDelta;
-      clockFace.style.transform = `rotate(${newAngle * -1}deg)`; // Counter-clockwise for alignment
-
-      // Store the new angle
+      clockFace.style.transform = `rotate(${newAngle * -1}deg)`;
       lastAngles[clockId] = newAngle;
 
-      // Update "active" class
       const numbers = clockFace.querySelectorAll(".number");
       numbers.forEach((number, index) => {
-        if (index === currentValue) {
-          number.classList.add("active");
-        } else {
-          number.classList.remove("active");
-        }
+        number.classList.toggle("active", index === currentValue);
       });
     });
 
-    // Request next frame
     requestAnimationFrame(updateRotations);
   }
 
-  // Start the rotation updates
   updateRotations();
 }
 
-// Call the function to start the rotation
 rotateClockFaces();
