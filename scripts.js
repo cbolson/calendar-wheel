@@ -3,14 +3,13 @@ const MAX_MINUTES = 60;
 const MAX_HOURS = 24;
 const DEGREES_IN_CIRCLE = 360;
 
-const lastAngles = {}; // Define lastAngles in global scope
+const lastAngles = {};
 
-drawClockFaces();
-
+// Pad with '0' if value < 10
 function padWithZero(value) {
-  return value < 10 ? `0${value}` : value; // Pad with '0' if value < 10
+  return value < 10 ? `0${value}` : value;
 }
-
+// render clock faces
 function drawClockFaces() {
   const clockFaces = document.querySelectorAll(".clock-face");
   const currentDate = new Date();
@@ -53,37 +52,37 @@ function drawClockFaces() {
     const radius = clockFace.offsetWidth / 2 - 20;
     const center = clockFace.offsetWidth / 2;
 
-    let valueSet = []; // Initialize valueSet to an empty array
+    let valueSet = [];
     let currentValue;
 
     switch (clockType) {
       case "seconds":
-        valueSet = createValueSet(MAX_SECONDS, true); // Create with padding
-        currentValue = padWithZero(currentDateDetails.seconds); // Use padding function
+        valueSet = createValueSet(MAX_SECONDS, true);
+        currentValue = padWithZero(currentDateDetails.seconds);
         break;
       case "minutes":
-        valueSet = createValueSet(MAX_MINUTES, true); // Create with padding
-        currentValue = padWithZero(currentDateDetails.minutes); // Use padding function
+        valueSet = createValueSet(MAX_MINUTES, true);
+        currentValue = padWithZero(currentDateDetails.minutes);
         break;
       case "hours":
-        valueSet = createValueSet(MAX_HOURS, true); // Create with padding
-        currentValue = padWithZero(currentDateDetails.hours); // Use padding function
+        valueSet = createValueSet(MAX_HOURS, true);
+        currentValue = padWithZero(currentDateDetails.hours);
         break;
       case "days":
         valueSet = createValueSet(currentDateDetails.totalDaysInMonth); // Dynamic for number of days
-        currentValue = currentDateDetails.day; // Day not padded
+        currentValue = currentDateDetails.day;
         break;
       case "months":
-        valueSet = monthNames; // Set this directly to month names
-        currentValue = currentDateDetails.month; // Month not padded
+        valueSet = monthNames;
+        currentValue = currentDateDetails.month;
         break;
       case "years":
         valueSet = createValueSet(101, false).map((year) => 2000 + year - 1);
         currentValue = currentDateDetails.year - 2000; // Adjust for year indexing
         break;
       case "day-names":
-        valueSet = weekdayNames; // Dynamic for weekday names
-        currentValue = currentDateDetails.weekday; // Weekday not padded
+        valueSet = weekdayNames;
+        currentValue = currentDateDetails.weekday;
         break;
       default:
         console.error(`Unknown clock type: ${clockType}`);
@@ -116,7 +115,7 @@ function drawClockFaces() {
     lastAngles[clockId] = newAngle;
   });
 }
-
+// rotate clock faces
 function rotateClockFaces() {
   const clockFaces = document.querySelectorAll(".clock-face");
 
@@ -139,22 +138,22 @@ function rotateClockFaces() {
 
       switch (clockType) {
         case "seconds":
-          currentValue = padWithZero(now.getSeconds()); // Use padding function
+          currentValue = padWithZero(now.getSeconds());
           break;
         case "minutes":
-          currentValue = padWithZero(now.getMinutes()); // Use padding function
+          currentValue = padWithZero(now.getMinutes());
           break;
         case "hours":
-          currentValue = padWithZero(now.getHours()); // Use padding function
+          currentValue = padWithZero(now.getHours());
           break;
         case "days":
-          currentValue = now.getDate() - 1; // Ensure it is 0-indexed
+          currentValue = now.getDate() - 1;
           break;
         case "months":
-          currentValue = now.getMonth(); // 0-indexed
+          currentValue = now.getMonth();
           break;
         case "years":
-          currentValue = now.getFullYear() - 2000; // Year indexing
+          currentValue = now.getFullYear() - 2000;
           break;
 
         case "day-names":
@@ -184,8 +183,8 @@ function rotateClockFaces() {
 
     requestAnimationFrame(updateRotations);
   }
-
   updateRotations();
 }
 
+drawClockFaces();
 rotateClockFaces();
