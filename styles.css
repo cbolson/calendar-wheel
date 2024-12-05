@@ -36,13 +36,13 @@ body {
   background-color: steelblue;
   border: 1px solid rgba(255 255 255 / 0.25);
 }
-
+/* mask to cover all dates excepet the current one */
 .clock::after {
   content: "";
   position: absolute;
   inset: 1px;
   margin: auto;
-  background-color: rgba(0 0 0 / 0.75);
+  background-color: rgba(0 0 0 / 0.8);
   clip-path: polygon(
     0 0,
     100% 0,
@@ -53,9 +53,7 @@ body {
     100% 100%,
     0 100%
   );
-  /*background-image: conic-gradient(rgba(0 0 0 / .5) 75deg, #0000 75deg 105deg, rgba(0 0 0 / .5) 105deg);*/
   border-radius: 50%;
-
   z-index: 20;
 }
 .clock > div {
