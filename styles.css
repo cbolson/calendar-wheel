@@ -4,7 +4,8 @@
   box-sizing: border-box;
 }
 :root {
-  --size: 800px;
+  --clock-size: 800px;
+  --clock-speed: 200ms;
 }
 body {
   margin: 0;
@@ -16,13 +17,14 @@ body {
 }
 .clock {
   position: relative;
-  width: var(--size);
-  height: var(--size);
+  width: var(--clock-size);
+  height: var(--clock-size);
   aspect-ratio: 1;
   place-content: center;
   background: steelblue;
   border-radius: 50%;
 }
+/* clock center*/
 .clock::before {
   content: "";
   position: absolute;
@@ -36,14 +38,13 @@ body {
   background-color: steelblue;
   border: 1px solid rgba(255 255 255 / 0.25);
 }
-/* mask to cover all dates excepet the current one */
+/* clock mask to cover all dates except the current date and time */
 .clock::after {
   content: "";
   position: absolute;
   inset: 1px;
   margin: auto;
   background-color: rgba(0 0 0 / 0.8);
-
   clip-path: polygon(
     0 0,
     100% 0,
@@ -57,68 +58,47 @@ body {
   border-radius: 50%;
   z-index: 20;
 }
-.clock > .clock-face {
+.clock > div {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: var(--size);
-  height: var(--size);
-  aspect-ratio: 1;
-  isolation: isolate;
+  width: var(--clock-size);
+  height: var(--clock-size);
   aspect-ratio: 1;
   border-radius: 50%;
-  transition: 300ms linear;
+  transition: var(--clock-speed, 100ms) linear;
 }
-
 [data-clock="years"] {
-  --size: 780px;
+  --clock-size: 780px;
   border-color: transparent;
 }
 [data-clock="seconds"] {
-  --size: 675px;
+  --clock-size: 675px;
 }
 [data-clock="minutes"] {
-  --size: 600px;
+  --clock-size: 600px;
 }
 [data-clock="hours"] {
-  --size: 525px;
+  --clock-size: 525px;
 }
 [data-clock="days"] {
-  --size: 445px;
+  --clock-size: 445px;
 }
 [data-clock="months"] {
-  --size: 340px;
+  --clock-size: 340px;
   font-size: 0.8rem;
 }
 [data-clock="day-names"] {
-  --size: 180px;
+  --clock-size: 180px;
   font-size: 0.8rem;
 }
-
-.clock-face {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  /*background-color: red;*/
-  transition: 300ms linear;
-  color: black;
-  font-size: 0.9rem;
-}
-.clock-face > * {
+.clock > div > span {
   position: absolute;
   transform-origin: center;
   white-space: nowrap;
   color: white;
   /*opacity: .25;*/
 }
-
-.clock-face > *.active {
+.clock > div > span.active {
   /*opacity: 1;*/
-}
-.clock-face > *:has(+ .active),
-.clock-face > *.active + .number {
-  /*font-weight: 600;*/
-  /*opacity: .6;*/
 }

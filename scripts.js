@@ -116,17 +116,16 @@ function drawClockFaces() {
     lastAngles[clockId] = newAngle;
   });
 }
-// rotate clock faces
 function rotateClockFaces() {
   function updateRotations() {
     const now = new Date();
     const currentDateDetails = {
       seconds: now.getSeconds(),
       minutes: now.getMinutes(),
-      hours: now.getHours(),
+      hours: now.getHours() % 12, // Use 12-hour format
       day: now.getDate() - 1, // Indexed from 0 for days
-      month: now.getMonth(), // 0-indexed
-      year: now.getFullYear(), // Don't subtract 2000 here
+      month: now.getMonth(),
+      year: now.getFullYear(),
       weekday: now.getDay(),
     };
 
@@ -137,13 +136,13 @@ function rotateClockFaces() {
 
       switch (clockType) {
         case "seconds":
-          currentValue = padWithZero(now.getSeconds());
+          currentValue = now.getSeconds();
           break;
         case "minutes":
-          currentValue = padWithZero(now.getMinutes());
+          currentValue = now.getMinutes();
           break;
         case "hours":
-          currentValue = padWithZero(now.getHours());
+          currentValue = now.getHours() % 12; // Ensures it wraps for 12-hour format
           break;
         case "days":
           currentValue = now.getDate() - 1;
@@ -154,7 +153,6 @@ function rotateClockFaces() {
         case "years":
           currentValue = now.getFullYear() - 2000;
           break;
-
         case "day-names":
           currentValue = now.getDay();
           break;
@@ -163,17 +161,20 @@ function rotateClockFaces() {
           return;
       }
 
-      // Calculate target angle to allow continuous rotation
+      // Calculate target angle for continuous rotation
       const targetAngle = (DEGREES_IN_CIRCLE / totalNumbers) * currentValue;
       const clockId = clockFace.id || clockType;
       const lastAngle = lastAngles[clockId] || 0;
       const delta = targetAngle - lastAngle;
-      const shortestDelta = ((delta + 540) % DEGREES_IN_CIRCLE) - 180;
 
-      const newAngle = lastAngle + shortestDelta;
+      // Instead of using shortestDelta, ensure smooth rotation
+      const newAngle = lastAngle + delta;
+
+      // Apply the rotation
       clockFace.style.transform = `rotate(${newAngle * -1}deg)`;
       lastAngles[clockId] = newAngle;
 
+      // Maintain the active state of displayed numbers
       const numbers = clockFace.querySelectorAll(".number");
       numbers.forEach((number, index) => {
         number.classList.toggle("active", index === currentValue);
