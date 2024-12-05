@@ -57,7 +57,7 @@ body {
   border-radius: 50%;
   z-index: 20;
 }
-.clock > div {
+.clock > .clock-face {
   position: absolute;
   inset: 0;
   margin: auto;
@@ -67,38 +67,30 @@ body {
   isolation: isolate;
   aspect-ratio: 1;
   border-radius: 50%;
+  transition: 300ms linear;
 }
 
-/* years */
-.clock > div:nth-of-type(1) {
+[data-clock="years"] {
   --size: 780px;
   border-color: transparent;
 }
-/* seconds */
-.clock > div:nth-of-type(2) {
+[data-clock="seconds"] {
   --size: 675px;
 }
-/* minutes */
-.clock > div:nth-child(3) {
+[data-clock="minutes"] {
   --size: 600px;
 }
-.clock > div:nth-child(3)::after {
-}
-/* hours */
-.clock > div:nth-child(4) {
+[data-clock="hours"] {
   --size: 525px;
 }
-/* day names */
-.clock > div:nth-child(5) {
+[data-clock="days"] {
   --size: 445px;
 }
-/* day numbers */
-.clock > div:nth-child(6) {
+[data-clock="months"] {
   --size: 340px;
   font-size: 0.8rem;
 }
-/* month names*/
-.clock > div:nth-child(7) {
+[data-clock="day-names"] {
   --size: 180px;
   font-size: 0.8rem;
 }

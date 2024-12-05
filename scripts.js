@@ -5,13 +5,14 @@ const DEGREES_IN_CIRCLE = 360;
 
 const lastAngles = {};
 
+const clockFaces = document.querySelectorAll("[data-clock]");
+
 // Pad with '0' if value < 10
 function padWithZero(value) {
   return value < 10 ? `0${value}` : value;
 }
 // render clock faces
 function drawClockFaces() {
-  const clockFaces = document.querySelectorAll(".clock-face");
   const currentDate = new Date();
 
   // Get current date details
@@ -47,7 +48,7 @@ function drawClockFaces() {
     );
 
   clockFaces.forEach((clockFace) => {
-    const clockType = clockFace.getAttribute("data-clock");
+    const clockType = clockFace.dataset.clock;
     const numbers = parseInt(clockFace.getAttribute("data-numbers"), 10);
     const radius = clockFace.offsetWidth / 2 - 20;
     const center = clockFace.offsetWidth / 2;
@@ -117,8 +118,6 @@ function drawClockFaces() {
 }
 // rotate clock faces
 function rotateClockFaces() {
-  const clockFaces = document.querySelectorAll(".clock-face");
-
   function updateRotations() {
     const now = new Date();
     const currentDateDetails = {
@@ -132,7 +131,7 @@ function rotateClockFaces() {
     };
 
     clockFaces.forEach((clockFace) => {
-      const clockType = clockFace.getAttribute("data-clock");
+      const clockType = clockFace.dataset.clock;
       const totalNumbers = parseInt(clockFace.getAttribute("data-numbers"), 10);
       let currentValue;
 
