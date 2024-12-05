@@ -66,6 +66,7 @@ body {
   height: var(--clock-size);
   aspect-ratio: 1;
   border-radius: 50%;
+  font-size: 0.9rem;
   transition: var(--clock-speed, 100ms) linear;
 }
 [data-clock="years"] {
@@ -97,6 +98,7 @@ body {
   transform-origin: center;
   white-space: nowrap;
   color: white;
+
   /*opacity: .25;*/
 }
 .clock > div > span.active {
